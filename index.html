@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>よにんぐみ。配信スケジュール</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ami:   #A020F0;
+      --noise: #00C853;
+      --itou:  #FF6D00;
+      --ruka:  #0077FF;
+      --ami-bg:   #F3E0FF;
+      --noise-bg: #DDFFF0;
+      --itou-bg:  #FFF0DC;
+      --ruka-bg:  #DCF0FF;
+      --yellow: #FFE000;
+      --pink:   #FF3CAC;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+      background-color: #FFF9FE;
+      background-image:
+        radial-gradient(circle, #A020F022 3px, transparent 3px),
+        radial-gradient(circle, #0077FF22 3px, transparent 3px),
+        radial-gradient(circle, #FF6D0022 3px, transparent 3px),
+        radial-gradient(circle, #00C85322 3px, transparent 3px);
+      background-size: 80px 80px, 80px 80px, 80px 80px, 80px 80px;
+      background-position: 0 0, 40px 40px, 20px 60px, 60px 20px;
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 36px;
+      border: 5px solid #222;
+      box-shadow: 10px 10px 0 #222;
+      overflow: hidden;
+    }
+
+    /* ヘッダー */
+    .header {
+      background: linear-gradient(120deg, #A020F0 0%, #0077FF 40%, #00C853 75%, #FF6D00 100%);
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 5px solid #222;
+    }
+
+    .header::before {
+      content: '★ ✦ ★ ✦ ★ ✦ ★ ✦ ★ ✦ ★ ✦ ★ ✦ ★ ✦ ★ ✦ ★';
+      position: absolute;
+      bottom: 4px; left: 0; right: 0;
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 4px;
+    }
+
+    .header-logo-wrap {
+      background: #fff;
+      border: 3px solid #222;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0 #222;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .header img.logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 14px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-text h1 {
+      color: #fff;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-shadow: 4px 4px 0 #222;
+    }
+
+    .header-text p {
+      color: #FFE000;
+      font-size: 18px;
+      font-weight: 800;
+      margin-top: 6px;
+      text-shadow: 2px 2px 0 #222;
+    }
+
+    .header-stars {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 32px;
+    }
+
+    /* メンバーバッジ */
+    .members {
+      display: flex;
+      gap: 16px;
+      padding: 20px 36px;
+      background: #FFFCE8;
+      border-bottom: 5px solid #222;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .members-label {
+      font-size: 16px;
+      font-weight: 900;
+      color: #222;
+      margin-right: 4px;
+    }
+
+    .member-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 22px 10px 12px;
+      border-radius: 100px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      border: 3px solid #222;
+      box-shadow: 4px 4px 0 #222;
+    }
+
+    .member-badge img {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 2px solid rgba(255,255,255,0.7);
+      object-fit: contain;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .badge-ami   { background: var(--ami); }
+    .badge-noise { background: var(--noise); }
+    .badge-itou  { background: var(--itou); }
+    .badge-ruka  { background: var(--ruka); }
+
+    /* 週グリッド */
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .day-column {
+      border-right: 3px solid #222;
+    }
+    .day-column:last-child { border-right: none; }
+
+    .day-header {
+      text-align: center;
+      padding: 14px 4px;
+      font-weight: 900;
+      font-size: 18px;
+      background: #f0f0f0;
+      border-bottom: 3px solid #222;
+      color: #222;
+      line-height: 1.4;
+    }
+
+    .day-header.is-mon { background: #FFE0F6; color: #A020F0; }
+    .day-header.is-tue { background: #E0F0FF; color: #0077FF; }
+    .day-header.is-wed { background: #FFFDE0; color: #CC9900; }
+    .day-header.is-thu { background: #E0FFE8; color: #00A040; }
+    .day-header.is-fri { background: #FFE8E0; color: #E03000; }
+    .day-header.is-sat { background: #DCF0FF; color: #0055CC; }
+    .day-header.is-sun { background: #FFE0E0; color: #CC0000; }
+
+    .day-header.is-today {
+      background: var(--yellow) !important;
+      color: #222 !important;
+      position: relative;
+    }
+
+    .day-header.is-today::after {
+      content: '★TODAY★';
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: #e05000;
+      letter-spacing: 1px;
+    }
+
+    .day-date { font-size: 22px; font-weight: 900; }
+    .day-dow  { font-size: 14px; font-weight: 900; margin-top: 2px; }
+
+    .events {
+      padding: 12px 10px;
+      min-height: 240px;
+      background: #fff;
+    }
+
+    .event-card {
+      border-radius: 16px;
+      padding: 14px 14px;
+      margin-bottom: 12px;
+      color: #fff;
+      font-size: 15px;
+      border: 3px solid #222;
+      box-shadow: 4px 4px 0 #222;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      top: -16px; right: -16px;
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+    }
+
+    .event-card .time {
+      font-size: 14px;
+      font-weight: 900;
+      opacity: 0.95;
+      margin-bottom: 8px;
+      background: rgba(0,0,0,0.18);
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 100px;
+    }
+
+    .event-card .member-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+
+    .event-card .member-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.7);
+      object-fit: contain;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .event-card .member-name {
+      font-size: 13px;
+      font-weight: 900;
+      opacity: 0.95;
+    }
+
+    .event-card .title {
+      font-weight: 900;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .bg-ami   { background: var(--ami); }
+    .bg-noise { background: var(--noise); }
+    .bg-itou  { background: var(--itou); }
+    .bg-ruka  { background: var(--ruka); }
+    .bg-collab {
+      background: linear-gradient(135deg, var(--ami) 0%, var(--ruka) 35%, var(--noise) 65%, var(--itou) 100%);
+      border-color: #222;
+    }
+
+    .empty-day {
+      text-align: center;
+      font-size: 22px;
+      padding: 30px 0 10px;
+      opacity: 0.2;
+    }
+
+    /* フッター */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      background: #222;
+      border-top: 5px solid #222;
+    }
+
+    .footer-tag {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-deco {
+      font-size: 24px;
+      letter-spacing: 8px;
+    }
+
+    .updated {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 700;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #999;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="header-logo-wrap">
+        <img class="logo" src="images/logo.png" alt="よにんぐみ。">
+      </div>
+      <div class="header-text">
+        <h1>よにんぐみ。配信スケジュール</h1>
+        <p id="week-range">読み込み中...</p>
+      </div>
+      <div class="header-stars">🎉🌟🎊
+      </div>
+    </div>
+
+    <div class="members">
+      <span class="members-label">✦ MEMBER ✦</span>
+      <div class="member-badge badge-ami">
+        <img src="images/ami.png" alt="看竜アミ"> 看竜アミ
+      </div>
+      <div class="member-badge badge-noise">
+        <img src="images/noise.png" alt="如月ノイズ"> 如月ノイズ
+      </div>
+      <div class="member-badge badge-itou">
+        <img src="images/itou.png" alt="いとうすとら"> いとうすとら
+      </div>
+      <div class="member-badge badge-ruka">
+        <img src="images/ruka.png" alt="深影ルカ"> 深影ルカ
+      </div>
+    </div>
+
+    <div id="schedule-container">
+      <div class="loading">スケジュールを読み込み中...</div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-tag">★ #よにんぐみ ★</div>
+      <div class="footer-deco">🟣🟢🟠🔵</div>
+      <div class="updated" id="updated-time"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // ★ Googleスプレッドシートを「ウェブに公開（CSV）」したURLを貼り付けてください
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxyiNJ8CNdVyapKoVZa3Zwv0jTpIoJP4dKy_srkQLuMB0xAh0J6eWC4KcmZgjKfP9-NIWcROrCRPq8/pub?gid=1606312556&single=true&output=csv';
+
+    const MEMBERS = {
+      '看竜アミ':        { color: 'ami',    icon: 'images/ami.png' },
+      '如月ノイズ':      { color: 'noise',  icon: 'images/noise.png' },
+      'いとうすとら':    { color: 'itou',   icon: 'images/itou.png' },
+      '深影ルカ':        { color: 'ruka',   icon: 'images/ruka.png' },
+      'よにんぐみ。コラボ': { color: 'collab', icon: 'images/logo.png' },
+    };
+
+    const DAYS_JA  = ['日','月','火','水','木','金','土'];
+    const DAY_CLS  = ['is-sun','is-mon','is-tue','is-wed','is-thu','is-fri','is-sat'];
+
+    function getWeekDates() {
+      const today = new Date();
+      const day = today.getDay();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - day + (day === 0 ? -6 : 1));
+      monday.setHours(0,0,0,0);
+      return Array.from({length: 7}, (_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return d;
+      });
+    }
+
+    function toDateStr(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+      return lines.slice(1)
+        .map(line => {
+          const values = line.split(',').map(v => v.trim().replace(/^"|"$/g,''));
+          const obj = {};
+          headers.forEach((h, i) => obj[h] = values[i] || '');
+          return obj;
+        })
+        .filter(r => r['日付']);
+    }
+
+    function renderSchedule(events) {
+      const week = getWeekDates();
+      const todayStr = toDateStr(new Date());
+
+      document.getElementById('week-range').textContent =
+        `${week[0].getMonth()+1}月${week[0].getDate()}日（月）〜 ${week[6].getMonth()+1}月${week[6].getDate()}日（日）`;
+
+      const grid = week.map(day => {
+        const ds = toDateStr(day);
+        const dayEvents = events
+          .filter(e => e['日付'] === ds)
+          .sort((a, b) => (a['開始時間']||'').localeCompare(b['開始時間']||''));
+
+        const isToday = ds === todayStr;
+        const dow = day.getDay();
+        let headerClass = `day-header ${DAY_CLS[dow]}`;
+        if (isToday) headerClass += ' is-today';
+
+        const cards = dayEvents.length === 0
+          ? '<div class="empty-day">😴</div>'
+          : dayEvents.map(e => {
+              const m = MEMBERS[e['メンバー']] || { color: 'ami', icon: '' };
+              return `
+                <div class="event-card bg-${m.color}">
+                  <div class="time">🕐 ${e['開始時間'] || ''}</div>
+                  <div class="member-row">
+                    ${m.icon ? `<img class="member-icon" src="${m.icon}" alt="">` : ''}
+                    <span class="member-name">${e['メンバー'] || ''}</span>
+                  </div>
+                  <div class="title">${e['タイトル'] || '配信'}</div>
+                </div>`;
+            }).join('');
+
+        return `
+          <div class="day-column">
+            <div class="${headerClass}">
+              <div class="day-date">${day.getMonth()+1}/${day.getDate()}</div>
+              <div class="day-dow">${DAYS_JA[dow]}曜日</div>
+            </div>
+            <div class="events">${cards}</div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('schedule-container').innerHTML =
+        `<div class="schedule-grid">${grid}</div>`;
+
+      document.getElementById('updated-time').textContent =
+        `更新: ${new Date().toLocaleString('ja-JP')}`;
+    }
+
+    function demoEvents() {
+      const week = getWeekDates();
+      return [
+        { '日付': toDateStr(week[0]), '開始時間': '20:00', 'メンバー': '看竜アミ',    'タイトル': '雑談配信' },
+        { '日付': toDateStr(week[1]), '開始時間': '19:00', 'メンバー': '如月ノイズ',  'タイトル': 'ゲーム配信' },
+        { '日付': toDateStr(week[2]), '開始時間': '21:00', 'メンバー': 'いとうすとら','タイトル': 'カラオケ' },
+        { '日付': toDateStr(week[3]), '開始時間': '20:00', 'メンバー': '深影ルカ',    'タイトル': '雑談' },
+        { '日付': toDateStr(week[4]), '開始時間': '19:30', 'メンバー': '看竜アミ',    'タイトル': 'ゲーム実況' },
+        { '日付': toDateStr(week[5]), '開始時間': '18:00', 'メンバー': 'いとうすとら','タイトル': 'お絵かき配信' },
+        { '日付': toDateStr(week[5]), '開始時間': '20:00', 'メンバー': 'よにんぐみ。コラボ', 'タイトル': 'みんなで特番！' },
+        { '日付': toDateStr(week[6]), '開始時間': '20:00', 'メンバー': '深影ルカ',    'タイトル': '特番！' },
+      ];
+    }
+
+    async function loadSchedule() {
+      if (SHEET_CSV_URL === 'YOUR_GOOGLE_SHEETS_CSV_URL') {
+        renderSchedule(demoEvents());
+        return;
+      }
+      try {
+        const res = await fetch(SHEET_CSV_URL);
+        const text = await res.text();
+        renderSchedule(parseCSV(text));
+      } catch {
+        document.getElementById('schedule-container').innerHTML =
+          '<div class="loading">読み込みに失敗しました。URLを確認してください。</div>';
+      }
+    }
+
+    loadSchedule();
+  </script>
+</body>
+</html>
