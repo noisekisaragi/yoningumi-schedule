@@ -365,8 +365,7 @@
   </div>
 
   <script>
-    // ★ Googleスプレッドシートを「ウェブに公開（CSV）」したURLを貼り付けてください
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxyiNJ8CNdVyapKoVZa3Zwv0jTpIoJP4dKy_srkQLuMB0xAh0J6eWC4KcmZgjKfP9-NIWcROrCRPq8/pub?gid=1606312556&single=true&output=csv';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxJ_ppUpGYVEltH4XoZCXCau4Q4KYEkfy-w-bZxcv-1xYXiSXgvJWzVuaXqUthE5ABL/exec';
 
     const MEMBERS = {
       '看竜アミ':        { color: 'ami',    icon: 'images/ami.png' },
@@ -473,31 +472,18 @@
       ];
     }
 
-    async function fetchCSV(url) {
-      const proxies = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-      ];
-      for (const proxy of proxies) {
-        try {
-          const res = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
-          if (!res.ok) continue;
-          const text = await res.text();
-          if (text.includes('日付')) return text;
-        } catch {}
-      }
-      throw new Error('取得失敗');
-    }
-
     async function loadSchedule() {
-      if (SHEET_CSV_URL === 'YOUR_GOOGLE_SHEETS_CSV_URL') {
-        renderSchedule(demoEvents());
-        return;
-      }
       try {
-        const text = await fetchCSV(SHEET_CSV_URL);
-        renderSchedule(parseCSV(text));
+        const res = await fetch(GAS_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const events = json.map(row => ({
+          '日付':     String(row['日付'] || '').trim(),
+          '開始時間': String(row['開始時間'] || '').trim(),
+          'メンバー': String(row['メンバー'] || '').trim(),
+          'タイトル': String(row['タイトル'] || '').trim(),
+        }));
+        renderSchedule(events);
       } catch {
         document.getElementById('schedule-container').innerHTML =
           '<div class="loading">読み込みに失敗しました。<br>F5で再読み込みしてください。</div>';
