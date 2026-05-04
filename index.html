@@ -488,12 +488,35 @@
         clearTimeout(timer);
         delete window[callbackName];
         if (script.parentNode) script.parentNode.removeChild(script);
-        const events = data.map(row => ({
-          '日付':     String(row['日付'] || '').trim(),
-          '開始時間': String(row['開始時間'] || '').trim(),
-          'メンバー': String(row['メンバー'] || '').trim(),
-          'タイトル': String(row['タイトル'] || '').trim(),
-        }));
+        const events = data.map(row => {
+          const dateVal = row['日付'] || '';
+          const timeVal = row['開始時間'] || '';
+
+          let dateStr = String(dateVal).trim();
+          let timeStr = String(timeVal).trim();
+
+          // GASがDate文字列で返した場合に変換
+          if (dateStr.includes('GMT')) {
+            const d = new Date(dateStr);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            dateStr = `${y}-${m}-${day}`;
+          }
+          if (timeStr.includes('GMT')) {
+            const d = new Date(timeStr);
+            const hh = String(d.getUTCHours()).padStart(2, '0');
+            const mm = String(d.getUTCMinutes()).padStart(2, '0');
+            timeStr = `${hh}:${mm}`;
+          }
+
+          return {
+            '日付':     dateStr,
+            '開始時間': timeStr,
+            'メンバー': String(row['メンバー'] || '').trim(),
+            'タイトル': String(row['タイトル'] || '').trim(),
+          };
+        });
         renderSchedule(events);
       };
 
