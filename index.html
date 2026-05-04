@@ -478,13 +478,15 @@
         renderSchedule(demoEvents());
         return;
       }
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_CSV_URL)}`;
       try {
-        const res = await fetch(SHEET_CSV_URL);
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         renderSchedule(parseCSV(text));
-      } catch {
+      } catch(e) {
         document.getElementById('schedule-container').innerHTML =
-          '<div class="loading">読み込みに失敗しました。URLを確認してください。</div>';
+          `<div class="loading">読み込みに失敗しました（${e.message}）<br>時間をおいて再読み込みしてください。</div>`;
       }
     }
 
