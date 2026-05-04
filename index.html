@@ -473,20 +473,34 @@
       ];
     }
 
+    async function fetchCSV(url) {
+      const proxies = [
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+      ];
+      for (const proxy of proxies) {
+        try {
+          const res = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+          if (!res.ok) continue;
+          const text = await res.text();
+          if (text.includes('日付')) return text;
+        } catch {}
+      }
+      throw new Error('取得失敗');
+    }
+
     async function loadSchedule() {
       if (SHEET_CSV_URL === 'YOUR_GOOGLE_SHEETS_CSV_URL') {
         renderSchedule(demoEvents());
         return;
       }
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_CSV_URL)}`;
       try {
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
+        const text = await fetchCSV(SHEET_CSV_URL);
         renderSchedule(parseCSV(text));
-      } catch(e) {
+      } catch {
         document.getElementById('schedule-container').innerHTML =
-          `<div class="loading">読み込みに失敗しました（${e.message}）<br>時間をおいて再読み込みしてください。</div>`;
+          '<div class="loading">読み込みに失敗しました。<br>F5で再読み込みしてください。</div>';
       }
     }
 
