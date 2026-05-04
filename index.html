@@ -472,22 +472,39 @@
       ];
     }
 
-    async function loadSchedule() {
-      try {
-        const res = await fetch(GAS_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        const events = json.map(row => ({
+    function loadSchedule() {
+      const callbackName = 'gasCallback';
+      const script = document.createElement('script');
+      script.src = GAS_URL + '?callback=' + callbackName;
+
+      const timer = setTimeout(() => {
+        document.getElementById('schedule-container').innerHTML =
+          '<div class="loading">読み込みに失敗しました。<br>F5で再読み込みしてください。</div>';
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }, 10000);
+
+      window[callbackName] = function(data) {
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        const events = data.map(row => ({
           '日付':     String(row['日付'] || '').trim(),
           '開始時間': String(row['開始時間'] || '').trim(),
           'メンバー': String(row['メンバー'] || '').trim(),
           'タイトル': String(row['タイトル'] || '').trim(),
         }));
         renderSchedule(events);
-      } catch {
+      };
+
+      script.onerror = function() {
+        clearTimeout(timer);
+        delete window[callbackName];
         document.getElementById('schedule-container').innerHTML =
           '<div class="loading">読み込みに失敗しました。<br>F5で再読み込みしてください。</div>';
-      }
+      };
+
+      document.head.appendChild(script);
     }
 
     loadSchedule();
